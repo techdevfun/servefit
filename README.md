@@ -8,7 +8,7 @@ tired of "production inference engine" headlines that assume 64 Blackwell GPUs.
 ## 30 seconds
 
 ```bash
-pip install servefit
+pip install git+https://github.com/techdevfun/servefit
 servefit inventory
 servefit fit --model Qwen/Qwen3-8B
 ```
