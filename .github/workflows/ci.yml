@@ -16,6 +16,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install pytest
+      - run: pip install .
       - run: pytest -q
       - run: python -m servefit --version
       - run: python -m servefit inventory --from examples/profile-rtx4090.json
