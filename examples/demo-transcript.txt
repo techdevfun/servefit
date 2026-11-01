@@ -1,0 +1,72 @@
+# demo transcript: real servefit output; probe ran against a
+# scripted local fake OpenAI-compatible server (timings scripted).
+
+$ /usr/bin/python3 -m servefit --version
+servefit 0.1.0
+$ /usr/bin/python3 -m servefit inventory --from examples/profile-rtx4090.json
+# inventory loaded from examples/profile-rtx4090.json (synthetic)
+Hardware inventory (Linux)
+  CPU: 16 cores, RAM: 64.0 GiB
+  GPU: nvidia | NVIDIA GeForce RTX 4090 | 24.0 GiB VRAM | compute_cap 8.9 | driver 550.54
+  note: SYNTHETIC inventory for examples and demos, not a real machine.
+$ /usr/bin/python3 -m servefit fit --model Qwen3-8B --from examples/profile-rtx4090.json --no-hf --params 8 --dtype bf16 --layers 36 --kv-heads 8 --head-dim 128 --context 32768
+servefit fit: Qwen3-8B  (family: qwen)
+
+Memory math: weights 14.9 + KV 4.5 + overhead 1.0 = 20.4 GiB
+  dtype bf16, ctx 32768, layers 36, kv-heads 8, head-dim 128
+
+RECOMMENDED: SGLang
+  + chip: compute_cap 8.9 >= 7.5
+  + model: qwen family supported
+  + memory: needs ~20.4 GiB, single-GPU VRAM has 24.0 GiB (fits)
+
+Starter config:
+  # install: pip install sglang[all]
+  python -m sglang.launch_server --model-path Qwen3-8B --context-length 32768
+
+Missing for production (you still build these):
+  - Smaller operator community than vLLM; fewer battle-tested deployment guides.
+  - No built-in load balancing across replicas; bring your own gateway.
+  - AMD/ROCm maturity trails NVIDIA.
+
+Viable engines:
+  [ok] SGLang  (matrix checked 2026-11-01)
+       chip: compute_cap 8.9 >= 7.5
+       model: qwen family supported
+       memory: needs ~20.4 GiB, single-GPU VRAM has 24.0 GiB (fits)
+  [ok] vLLM  (matrix checked 2026-11-01)
+       chip: compute_cap 8.9 >= 7.0
+       model: qwen family supported
+       memory: needs ~20.4 GiB, single-GPU VRAM has 24.0 GiB (fits)
+  [ok] TensorRT-LLM  (matrix checked 2026-11-01)
+       chip: compute_cap 8.9 >= 7.5
+       model: qwen family supported
+       memory: needs ~20.4 GiB, single-GPU VRAM has 24.0 GiB (fits)
+  [ok] llama.cpp  (matrix checked 2026-11-01)
+       chip: any NVIDIA GPU works
+       model: qwen family supported
+       memory: needs ~20.4 GiB, single-GPU VRAM has 24.0 GiB (fits)
+  [ok] Ollama  (matrix checked 2026-11-01)
+       chip: any NVIDIA GPU works
+       model: qwen family supported
+       memory: needs ~20.4 GiB, single-GPU VRAM has 24.0 GiB (fits)
+
+Not viable:
+  [no] DeepInfer
+       chip: needs NVIDIA SM100 (Blackwell) or Ascend 950; have compute_cap 8.9
+       model: qwen not in supported families (deepseek-v4.1-flash-only)
+       memory: needs ~20.4 GiB, single-GPU VRAM has 24.0 GiB (fits)
+
+Assumptions:
+  - weights = params x bytes-per-param (bf16 = 2.0 B)
+  - kv cache = 2 x 36 layers x 8 kv-heads x 128 head-dim x 2.0 B x 32768 ctx (single sequence; multiply by expected concurrency yourself)
+  - overhead = max(1 GiB, 5%% of weights+kv); covers CUDA context, activations, fragmentation
+  - Matrix is a dated snapshot (see check dates); re-verify before spending money.
+$ /usr/bin/python3 -m servefit probe --endpoint http://127.0.0.1:33265 --model demo-8b
+Probe: http://127.0.0.1:33265  model demo-8b
+  TTFT: 0.283 s
+  Throughput: 19.9 tok/s (approx, 7 tokens in 0.635 s)
+  stream completed: True
+  note: Numbers measured on THIS machine, under current load, against THIS endpoint.
+  note: Token count is approximate (whitespace split), not the model's tokenizer.
+  note: Not a benchmark claim about the engine.

@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install pytest
+      - run: pytest -q
+      - run: python -m servefit --version
+      - run: python -m servefit inventory --from examples/profile-rtx4090.json
+      - run: python -m servefit fit --model Qwen3-8B --from examples/profile-rtx4090.json --no-hf --params 8 --dtype bf16 --layers 36 --kv-heads 8 --head-dim 128 --context 32768

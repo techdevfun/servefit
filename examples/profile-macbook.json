@@ -1,0 +1,19 @@
+{
+  "cpu_count": 12,
+  "gpus": [
+    {
+      "compute_cap": "",
+      "driver": "",
+      "name": "Apple M3 Pro",
+      "vendor": "apple",
+      "vram_gb": 0.0
+    }
+  ],
+  "notes": [
+    "SYNTHETIC inventory for examples and demos, not a real machine.",
+    "Apple Silicon detected: unified memory is shared between CPU and GPU; servefit does not split it and reports GPU VRAM as unknown. Ollama / llama.cpp are the practical local options."
+  ],
+  "os": "Darwin",
+  "ram_gb": 36.0,
+  "total_vram_gb": 0.0
+}

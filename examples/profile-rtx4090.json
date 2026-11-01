@@ -1,0 +1,18 @@
+{
+  "cpu_count": 16,
+  "gpus": [
+    {
+      "compute_cap": "8.9",
+      "driver": "550.54",
+      "name": "NVIDIA GeForce RTX 4090",
+      "vendor": "nvidia",
+      "vram_gb": 24.0
+    }
+  ],
+  "notes": [
+    "SYNTHETIC inventory for examples and demos, not a real machine."
+  ],
+  "os": "Linux",
+  "ram_gb": 64.0,
+  "total_vram_gb": 24.0
+}

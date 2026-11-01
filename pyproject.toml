@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "servefit"
+version = "0.1.0"
+description = "Honest scope map for serving LLMs on your own hardware"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "techdevfun" }]
+keywords = ["llm", "inference", "vllm", "sglang", "gpu", "serving"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = []
+
+[project.scripts]
+servefit = "servefit.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/techdevfun/servefit"
+
+[tool.setuptools.packages.find]
+include = ["servefit*"]

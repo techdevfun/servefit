@@ -1,0 +1,39 @@
+{
+  "cpu_count": 96,
+  "gpus": [
+    {
+      "compute_cap": "8.0",
+      "driver": "550.54",
+      "name": "NVIDIA A100-SXM4-80GB",
+      "vendor": "nvidia",
+      "vram_gb": 80.0
+    },
+    {
+      "compute_cap": "8.0",
+      "driver": "550.54",
+      "name": "NVIDIA A100-SXM4-80GB",
+      "vendor": "nvidia",
+      "vram_gb": 80.0
+    },
+    {
+      "compute_cap": "8.0",
+      "driver": "550.54",
+      "name": "NVIDIA A100-SXM4-80GB",
+      "vendor": "nvidia",
+      "vram_gb": 80.0
+    },
+    {
+      "compute_cap": "8.0",
+      "driver": "550.54",
+      "name": "NVIDIA A100-SXM4-80GB",
+      "vendor": "nvidia",
+      "vram_gb": 80.0
+    }
+  ],
+  "notes": [
+    "SYNTHETIC inventory for examples and demos, not a real machine."
+  ],
+  "os": "Linux",
+  "ram_gb": 512.0,
+  "total_vram_gb": 320.0
+}
