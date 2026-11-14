@@ -135,13 +135,26 @@ def get(name: str) -> dict | None:
     return None
 
 
+def _cap_tuple(cap: str) -> tuple:
+    """Parse a compute capability like "10.0" into (10, 0) for numeric compare.
+
+    Plain string comparison is wrong here: "10.0" < "7.0" lexicographically,
+    so Blackwell (SM100, 10.0) was rejected by every >= 7.x gate. An
+    unparseable value maps to (0,) so the gate fails closed, never assumed.
+    """
+    try:
+        return tuple(int(p) for p in cap.split("."))
+    except (AttributeError, ValueError):
+        return (0,)
+
+
 def chip_supported(engine: dict, vendor: str, compute_cap: str) -> tuple:
     """Return (supported: bool, reason: str)."""
     chips = engine["chips"]
     if vendor == "nvidia":
         if "nvidia-only" in chips or "nvidia-ampere+" in chips:
             if engine["min_compute_cap"] and compute_cap:
-                ok = compute_cap >= engine["min_compute_cap"]
+                ok = _cap_tuple(compute_cap) >= _cap_tuple(engine["min_compute_cap"])
                 return ok, ("compute_cap %s >= %s" % (compute_cap, engine["min_compute_cap"])
                             if ok else
                             "needs compute_cap >= %s, have %s"
