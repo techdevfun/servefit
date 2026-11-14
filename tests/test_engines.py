@@ -44,6 +44,25 @@ def test_vllm_compute_cap_gate():
     assert "6.1" in why
 
 
+def test_blackwell_10_0_passes_ampere_gates():
+    # Regression: compute_cap was compared as a STRING, and "10.0" < "7.0"
+    # lexicographically, so a Blackwell B100/B200 (10.0) was rejected by
+    # every >= 7.x gate and servefit recommended llama.cpp on a 192 GiB GPU.
+    for name in ("vLLM", "SGLang", "TensorRT-LLM"):
+        ok, why = eng.chip_supported(eng.get(name), "nvidia", "10.0")
+        assert ok, "%s rejected Blackwell 10.0: %s" % (name, why)
+
+
+def test_compute_cap_gate_boundary_values():
+    vllm = eng.get("vLLM")  # min 7.0
+    assert eng.chip_supported(vllm, "nvidia", "7.0")[0]
+    assert not eng.chip_supported(vllm, "nvidia", "6.9")[0]
+    sgl = eng.get("SGLang")  # min 7.5
+    assert eng.chip_supported(sgl, "nvidia", "7.5")[0]
+    assert not eng.chip_supported(sgl, "nvidia", "7.4")[0]
+    assert eng.chip_supported(sgl, "nvidia", "9.0")[0]
+
+
 def test_llamacpp_accepts_cpu_and_apple():
     lc = eng.get("llama.cpp")
     ok, _ = eng.chip_supported(lc, "apple", "")
