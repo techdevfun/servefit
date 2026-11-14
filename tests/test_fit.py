@@ -16,6 +16,20 @@ def _mem_8b():
     return memory_math.total_gb(8.0, "bf16", 36, 8, 128, 32768)
 
 
+def test_fit_8b_on_blackwell_b200_recommends_serving_engine():
+    # Regression: string comparison of compute_cap ("10.0" < "7.0") made
+    # vLLM/SGLang/TensorRT-LLM non-viable on Blackwell, so fit recommended
+    # llama.cpp on a 192 GiB B200.
+    inv = invmod.Inventory(os="Linux", cpu_count=32, ram_gb=256.0)
+    inv.gpus.append(invmod.GPU("nvidia", "NVIDIA B200", 192.0, "10.0", "580.00"))
+    res = fitmod.fit("Qwen3-8B", _mem_8b(), inv)
+    rec = res["recommendation"]
+    assert rec is not None
+    assert rec["engine"] in ("SGLang", "vLLM")
+    assert "vLLM" in [r["name"] for r in res["viable"]]
+    assert "SGLang" in [r["name"] for r in res["viable"]]
+
+
 def test_fit_8b_on_rtx4090_recommends_viable_engine():
     inv = _rtx4090_box()
     res = fitmod.fit("Qwen3-8B", _mem_8b(), inv)
